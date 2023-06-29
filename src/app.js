@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const { off } = require('../models/product.js');
-const products   =require("../models/product.js");
+const products = require("../models/product.js");
 
 
 // Import routes
@@ -25,14 +25,20 @@ app.use(express.json());
 //This route should return an array of _id of all the element that need to be rturned.
 //output id can be in any order.
 
-app.get("/",async function(req,res){
+app.get("/", async function (req, res) {
+    try {
+        const limit = parseInt(req.query.limit) || 5;
+        const offset = parseInt(req.query.offset) || 0;
+        const productss = await products.find()
+            .skip(limit * offset)
+            .limit(limit)
+            .select('_id');
 
-    var ids = [];
-    
-    //Write your Code here.
-
-    res.send(ids);
-
+        const ids = productss.map(product => product._id);
+        res.json(ids);
+    } catch (error) {
+        res.send(error);
+    }
 });
 
 module.exports = app;
