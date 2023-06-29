@@ -25,19 +25,24 @@ app.use(express.json());
 //This route should return an array of _id of all the element that need to be rturned.
 //output id can be in any order.
 
+
 app.get("/", async function (req, res) {
     try {
-        const limit = parseInt(req.query.limit) || 5;
-        const offset = parseInt(req.query.offset) || 0;
-        const productss = await products.find()
-            .skip(limit * offset)
-            .limit(limit)
-            .select('_id');
+        // console.log(req.query, "req.query")
+        const limit = (req.query.limit < 5 ? req.query.limit : 5 );
+        const offset = req.query.offset || 0;
+        // console.log(limit, offset,"limit, offset")
+        // var ids = [];
 
-        const ids = productss.map(product => product._id);
-        res.json(ids);
+        //Write your Code here.
+        const resFromDB = await products.find().skip(limit * offset).limit(limit).select('_id');
+        
+        const ids = resFromDB.map(pro => pro._id)
+
+        res.send(ids);
+
     } catch (error) {
-        res.send(error);
+        return res.send(error)
     }
 });
 
